@@ -9,27 +9,58 @@
 body{
     margin:0;
     font-family: Arial, sans-serif;
-    background:#f5f7fa;
+    min-height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    min-height:100vh;
+
+    /* легкий сірий градієнт */
+    background: linear-gradient(135deg, #e5e7eb, #f3f4f6, #e5e7eb);
     color:#111827;
 }
 
+/* картка “на передньому плані” */
 .card{
     width:100%;
     max-width:520px;
-    background:#fff;
-    border:1px solid #e5e7eb;
-    border-radius:16px;
-    padding:24px;
+
+    background:#ffffff;
+    border-radius:18px;
+
+    padding:26px;
+
+    /* обводка + глибина */
+    border:1px solid #d1d5db;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.12),
+        0 1px 0 rgba(255,255,255,0.6) inset;
+
+    position:relative;
+}
+
+/* тонка синя акцентна рамка */
+.card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:18px;
+    padding:1px;
+
+    background: linear-gradient(135deg, #2563eb, transparent);
+
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+
+    pointer-events:none;
 }
 
 h1{
     font-size:20px;
-    margin-bottom:16px;
     text-align:center;
+    margin-bottom:18px;
 }
 
 .grid{
@@ -49,27 +80,32 @@ label{
 }
 
 input{
-    padding:10px 12px;
+    padding:11px 12px;
     border:1px solid #e5e7eb;
     border-radius:10px;
     font-size:15px;
     outline:none;
+    transition:0.2s;
+    background:#fafafa;
 }
 
 input:focus{
     border-color:#2563eb;
+    background:white;
+    box-shadow:0 0 0 3px rgba(37,99,235,0.15);
 }
 
 .result{
     margin-top:18px;
     text-align:center;
-    padding:16px;
+    padding:18px;
     border-top:1px solid #e5e7eb;
 }
 
 .big{
-    font-size:40px;
+    font-size:44px;
     font-weight:700;
+    color:#111827;
 }
 
 .small{
@@ -98,7 +134,7 @@ input:focus{
         </div>
 
         <div class="row">
-            <label>Пакування (можна редагувати)</label>
+            <label>Пакування (редагується)</label>
             <input type="number" id="pack" value="0" oninput="packEdited = true; calc()">
         </div>
 
@@ -126,7 +162,6 @@ input:focus{
 </div>
 
 <script>
-
 let packEdited = false;
 
 function calc(){
@@ -134,7 +169,6 @@ function calc(){
     const ds = Number(document.getElementById("ds").value) || 0;
     const tz = Number(document.getElementById("tz").value) || 0;
 
-    // якщо користувач НЕ редагував — рахуємо автоматично
     if(!packEdited){
         document.getElementById("pack").value = ds + tz;
     }
