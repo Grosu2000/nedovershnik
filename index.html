@@ -3,109 +3,83 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Калькулятор результативності</title>
+<title>Результативність</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
-}
-
 body{
-    min-height:100vh;
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#f5f7fa;
     display:flex;
     justify-content:center;
     align-items:center;
-    background:linear-gradient(135deg,#0f172a,#1e293b,#334155);
-    color:white;
-    padding:20px;
+    min-height:100vh;
+    color:#111827;
 }
 
 .card{
     width:100%;
-    max-width:500px;
-    background:rgba(255,255,255,0.08);
-    backdrop-filter:blur(12px);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:20px;
-    padding:25px;
-    box-shadow:0 10px 30px rgba(0,0,0,.3);
+    max-width:520px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+    padding:24px;
 }
 
 h1{
+    font-size:20px;
+    margin-bottom:16px;
     text-align:center;
-    margin-bottom:20px;
-    font-size:28px;
 }
 
 .grid{
     display:grid;
-    gap:15px;
+    gap:12px;
 }
 
-.input-group{
+.row{
     display:flex;
     flex-direction:column;
 }
 
 label{
-    margin-bottom:6px;
-    font-size:14px;
-    color:#cbd5e1;
+    font-size:13px;
+    color:#6b7280;
+    margin-bottom:4px;
 }
 
 input{
-    padding:12px;
-    border:none;
+    padding:10px 12px;
+    border:1px solid #e5e7eb;
     border-radius:10px;
-    background:#1e293b;
-    color:white;
-    font-size:16px;
+    font-size:15px;
     outline:none;
 }
 
 input:focus{
-    box-shadow:0 0 0 2px #3b82f6;
-}
-
-button{
-    margin-top:20px;
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-    background:#2563eb;
-    color:white;
-    font-size:18px;
-    cursor:pointer;
-    transition:.2s;
-}
-
-button:hover{
-    background:#1d4ed8;
+    border-color:#2563eb;
 }
 
 .result{
-    margin-top:25px;
+    margin-top:18px;
     text-align:center;
-    display:none;
+    padding:16px;
+    border-top:1px solid #e5e7eb;
 }
 
-.score{
-    font-size:42px;
-    font-weight:bold;
-    color:#60a5fa;
+.big{
+    font-size:40px;
+    font-weight:700;
 }
 
-.points{
-    margin-top:10px;
-    color:#cbd5e1;
-    font-size:18px;
+.small{
+    font-size:14px;
+    color:#6b7280;
+    margin-top:6px;
 }
 </style>
 </head>
+
 <body>
 
 <div class="card">
@@ -113,80 +87,76 @@ button:hover{
 
     <div class="grid">
 
-        <div class="input-group">
-            <label>Збирання в ДС</label>
-            <input type="number" id="ds" value="0">
+        <div class="row">
+            <label>ДС</label>
+            <input type="number" id="ds" value="0" oninput="calc()">
         </div>
 
-        <div class="input-group">
-            <label>Збирання в ТЗ</label>
-            <input type="number" id="tz" value="0">
+        <div class="row">
+            <label>ТЗ</label>
+            <input type="number" id="tz" value="0" oninput="calc()">
         </div>
 
-        <div class="input-group">
-            <label>Пакування</label>
-            <input type="number" id="pack">
+        <div class="row">
+            <label>Пакування (можна редагувати)</label>
+            <input type="number" id="pack" value="0" oninput="packEdited = true; calc()">
         </div>
 
-        <div class="input-group">
+        <div class="row">
             <label>Переміщення</label>
-            <input type="number" id="move">
+            <input type="number" id="move" value="0" oninput="calc()">
         </div>
 
-        <div class="input-group">
+        <div class="row">
             <label>Розміщення</label>
-            <input type="number" id="place">
+            <input type="number" id="place" value="0" oninput="calc()">
         </div>
 
-        <div class="input-group">
-            <label>Години під сканом</label>
-            <input type="number" step="0.1" id="hours">
+        <div class="row">
+            <label>Години</label>
+            <input type="number" step="0.1" id="hours" value="1" oninput="calc()">
         </div>
 
     </div>
 
-    <button onclick="calculate()">
-        Розрахувати
-    </button>
-
-    <div class="result" id="result">
-        <div class="score" id="score">0</div>
-        <div class="points" id="points">0 балів</div>
+    <div class="result">
+        <div class="big" id="result">0.00</div>
+        <div class="small">балів / год</div>
     </div>
 </div>
 
 <script>
-function calculate() {
+
+let packEdited = false;
+
+function calc(){
 
     const ds = Number(document.getElementById("ds").value) || 0;
     const tz = Number(document.getElementById("tz").value) || 0;
+
+    // якщо користувач НЕ редагував — рахуємо автоматично
+    if(!packEdited){
+        document.getElementById("pack").value = ds + tz;
+    }
+
     const pack = Number(document.getElementById("pack").value) || 0;
     const move = Number(document.getElementById("move").value) || 0;
     const place = Number(document.getElementById("place").value) || 0;
-    const hours = Number(document.getElementById("hours").value) || 0;
+    const hours = Number(document.getElementById("hours").value) || 1;
 
-    if(hours <= 0){
-        alert("Вкажіть кількість годин.");
-        return;
-    }
-
-    const totalPoints =
+    const total =
         ds * 1 +
         tz * 3.3 +
         pack * 0.4 +
         move * 3.3 +
         place * 0.3;
 
-    const productivity = totalPoints / hours;
+    const res = total / hours;
 
-    document.getElementById("score").innerText =
-        productivity.toFixed(2);
-
-    document.getElementById("points").innerText =
-        `Загалом балів: ${totalPoints.toFixed(1)}`;
-
-    document.getElementById("result").style.display = "block";
+    document.getElementById("result").innerText = res.toFixed(2);
 }
+
+calc();
 </script>
 
 </body>
